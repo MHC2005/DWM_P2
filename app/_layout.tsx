@@ -5,8 +5,9 @@ export default function RootLayout() {
   return (
     <Stack>
       <Stack.Screen name="index"/>
-      <Stack.Screen name="AddPlanet"/>
+      <Stack.Screen name="AddTeam"/>
       <Stack.Screen name="details"/>
+      <Stack.Screen name="EditTeam" />
     </Stack>
   );
 }

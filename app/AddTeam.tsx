@@ -3,48 +3,46 @@ import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'reac
 import { useRouter } from 'expo-router';
 import { Stack } from "expo-router";
 
-export default function AddPlanet() {
+export default function AddTeam() {
   const router = useRouter();
-  const [planetName, setPlanetName] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [teamName, setTeamName] = useState('');
+  const [logo, setLogo] = useState('');
   const [description, setDescription] = useState('');
-  const [moonsAmount, setMoonsAmount] = useState('');
-  const [moons, setMoons] = useState('');
+  const [points, setPoints] = useState('');
+  const [goals, setGoals] = useState('');
 
-  const handleAddPlanet = async () => {
+  const handleAddTeam = async () => {
     // Validaciones de entrada
-    if (!planetName.trim() || !imageUrl.trim() || !description.trim()) {
+    if (!teamName.trim() || !logo.trim() || !description.trim()) {
       Alert.alert('Error', 'Por favor, completa todos los campos obligatorios.');
       return;
     }
 
-    if (isNaN(parseInt(moonsAmount, 10))) {
-      Alert.alert('Error', 'La cantidad de lunas debe ser un número válido.');
+    if (isNaN(parseInt(goals, 10))) {
+      Alert.alert('Error', 'La cantidad de goles debe ser un número válido.');
       return;
     }
 
-    // Crear el objeto de datos del nuevo planeta
-    const planetData = {
-      name: planetName.trim(),
-      imageUrl: imageUrl.trim(),
+    const teamData = {
+      name: teamName.trim(),
+      logo: logo.trim(),
       description: description.trim(),
-      moonsAmount: parseInt(moonsAmount, 10),
-      moons: (moons || '').split(',').map(moon => moon.trim()).filter(moon => moon), // Filtrar elementos vacíos
+      points: parseInt(points, 10),
+      goals: parseInt(goals, 10),
     };
 
     try {
-      // Realizar el POST a la API
       const response = await fetch('http://161.35.143.238:8000/mhernandez', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(planetData),
+        body: JSON.stringify(teamData),
       });
 
       if (response.ok) {
-        Alert.alert('Éxito', 'El planeta ha sido agregado.');
-        router.push('/'); // Redirigir a la pantalla principal
+        Alert.alert('Éxito', 'El equipo ha sido agregado.');
+        router.push('/'); 
       } else {
         const errorData = await response.json();
         Alert.alert('Error', errorData.message || 'No se pudo agregar el planeta.');
@@ -62,19 +60,19 @@ export default function AddPlanet() {
           title: "Agregar Planeta",
         }}
       />
-      <Text style={styles.title}>Nuevo Planeta</Text>
+      <Text style={styles.title}>Nueva Selección</Text>
       <TextInput
         style={styles.input}
         placeholder="Nombre"
-        value={planetName}
-        onChangeText={setPlanetName}
+        value={teamName}
+        onChangeText={setTeamName}
         placeholderTextColor="grey"
       />
       <TextInput
         style={styles.input}
-        placeholder="Imagen (url)"
-        value={imageUrl}
-        onChangeText={setImageUrl}
+        placeholder="Logo (url)"
+        value={logo}
+        onChangeText={setLogo}
         placeholderTextColor="grey"
       />
       <TextInput
@@ -86,20 +84,20 @@ export default function AddPlanet() {
       />
       <TextInput
         style={styles.input}
-        placeholder="Cantidad de lunas"
+        placeholder="Puntos"
         keyboardType="numeric"
-        value={moonsAmount}
-        onChangeText={setMoonsAmount}
+        value={points}
+        onChangeText={setPoints}
         placeholderTextColor="grey"
       />
       <TextInput
         style={styles.input}
-        placeholder="Lunas (separadas por comas)"
-        value={moons}
-        onChangeText={setMoons}
+        placeholder="Goles"
+        value={goals}
+        onChangeText={setGoals}
         placeholderTextColor="grey"
       />
-      <TouchableOpacity style={styles.addButton} onPress={handleAddPlanet}>
+      <TouchableOpacity style={styles.addButton} onPress={handleAddTeam}>
         <Text style={styles.buttonText}>Agregar</Text>
       </TouchableOpacity>
     </View>

@@ -1,74 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, FlatList, ActivityIndicator, Alert, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Stack } from "expo-router";
 import { Link } from 'expo-router';
 
-interface Planet {
+interface Team {
   id: string;
   name: string;
   description: string;
-  moons: string[];
-  moonsAmount: number;
-  image: string;
+  points: number;
+  goals: number;
+  logo: string;
 }
 
-export default function PlanetList() {
-  const [planets, setPlanets] = useState<Planet[]>([]); 
+export default function TeamList() {
+  const [teams, setTeams] = useState<Team[]>([]); 
   const [loading, setLoading] = useState(true); 
   const router = useRouter();
 
-  const fetchPlanets = async () => {
+  const fetchTeams = async () => {
     try {
       const response = await fetch('http://161.35.143.238:8000/mhernandez', {
       });
       if (!response.ok) {
         
-        throw new Error('Error al obtener los planetas');
+        throw new Error('Error al obtener los equipos');
       }
       const data = await response.json();
-      setPlanets(data); 
+      setTeams(data); 
     } catch (error) {
-      console.error('Error al cargar los planetas:', error);
+      console.error('Error al cargar los equipos:', error);
     } finally {
       setLoading(false); 
     }
   };
 
-  const detailsPlanet = async (id: string) => {
-    try {
-      const response = await fetch(`http://161.35.143.238:8000/mhernandez/${id}`, {
-      });
-      if (!response.ok) {
-        throw new Error('Error al obtener los detalles del planeta');
-      }
-      const data = await response.json();
-      return{
-        name: data.name,
-          image: data.image,
-          description: data.description,
-          moons: data.moons,
-          moonsAmount: data.moonsAmount,
-      }
-    } catch (error) {
-      console.error('Error al cargar los detalles del planeta:', error);
-    }
+  const sortTeamsByPoints = () => {
+    const sortedTeams = [...teams].sort((a, b) => {
+      return b.points - a.points; 
+    });
+    setTeams(sortedTeams);
   };
+  
+  
 
   useEffect(() => {
-    fetchPlanets(); 
+    fetchTeams(); 
   }, []);
 
-  const renderPlanet = ({ item }: { item: Planet }) => (
+  const renderTeam = ({ item }: { item: Team }) => (
     <Link
     href={{
         pathname: '/details',
         params: { id: item.id },
       }}
-      style={styles.planetContainer}
+      style={styles.teamContainer}
     >
-      <Image source={{ uri: item.image }} style={styles.planetImage} />
-      <Text style={styles.planetName}>{item.name}</Text>
+      <Image source={{ uri: item.logo }} style={styles.teamLogo} />
+      <Text style={styles.teamName}>{item.name}</Text>
     </Link>
   );
 
@@ -76,7 +65,7 @@ export default function PlanetList() {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#8ecae6" />
-        <Text>Cargando planetas...</Text>
+        <Text>Cargando equipos...</Text>
       </View>
     );
   }
@@ -88,18 +77,19 @@ export default function PlanetList() {
           title: "Home",
         }}
       />
-      <Text style={styles.title}>Planetario UCU</Text>
+      <Text style={styles.title}>Eliminatorias UCU</Text>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => router.push('/AddPlanet')}>
-          <Text style={styles.buttonText}>Agregar Planeta</Text>
+        <TouchableOpacity style={styles.button} onPress={() => router.push('/AddTeam')}>
+          <Text style={styles.buttonText}>Agregar Selección</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Ordenar Planetas</Text>
+        <TouchableOpacity style={styles.button} onPress={sortTeamsByPoints}>
+          <Text style={styles.buttonText}>Ordenar Equipos</Text>
         </TouchableOpacity>
+        
       </View>
       <FlatList
-        data={planets}
-        renderItem={renderPlanet}
+        data={teams}
+        renderItem={renderTeam}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
       />
@@ -114,8 +104,8 @@ const styles = StyleSheet.create({
   button: { backgroundColor: '#8ecae6', padding: 12, borderRadius: 8, flex: 1, marginHorizontal: 8 },
   buttonText: { textAlign: 'center', color: 'white', fontWeight: 'bold' },
   listContainer: { paddingBottom: 16 },
-  planetContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, padding: 12, backgroundColor: '#ffffff', borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8 },
-  planetImage: { width: 50, height: 50, marginRight: 12, borderRadius: 25 },
-  planetName: { fontSize: 18, fontWeight: 'bold' },
+  teamContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 16, padding: 12, backgroundColor: '#ffffff', borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8},
+  teamLogo: { width: 50, height: 50, marginRight: 12, borderRadius: 25 },
+  teamName: { fontSize: 18, fontWeight: 'bold' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 });
